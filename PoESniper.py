@@ -5,8 +5,8 @@ config = [
 	{
 		'identifier': 'BlnrowS8', # Sanctified Fossil,
 		'config': {
-			'max_price': 24, # The absolute highest price you will buy at
-			'resale': 32, # Resale price, used to determine profit margins
+			'max_price': 24,
+			'resale': 32,
 		},
 		'interval': 15
 	},
