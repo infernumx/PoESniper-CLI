@@ -10,7 +10,7 @@
 * `python -m pip install selenium bs4 apscheduler`
 
 ## Instructions
-* Open up `PoESniper.py`
+* Rename `config.dist.json` to `config.json` and open it
 * Edit `config` variable to suit which items you'd like to snipe
 > identifier : Unique identifier at the end of your trade URL (https://www.pathofexile.com/trade/exchange/Blight/IDENTIFIER)
  
