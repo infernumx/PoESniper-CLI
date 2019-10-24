@@ -1,10 +1,7 @@
 import console
 import init_sniper
-import json
+from configloader import config as SNIPER_CONFIG
 
-with open('config.json') as f:
-	config = json.loads(f.read())
-
-init_sniper.init(config)
+init_sniper.init(SNIPER_CONFIG['item-filters'])
 
 console.start()

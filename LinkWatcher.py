@@ -14,6 +14,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
+from configloader import config as SNIPER_CONFIG
 
 output_lock = Lock()
 
@@ -183,10 +184,10 @@ class LinkWatcher():
 			if self.init:
 				# don't play sound if initializing
 				self.init = False
-			elif force_ding and whispers:
-				def sound():
-					playsound('ding.mp3')
-				thread = Thread(target=sound)
+			elif force_ding and whispers and SNIPER_CONFIG['general-config']['ding']:
+				def ding():
+					playsound('resources/ding.mp3')
+				thread = Thread(target=ding)
 				thread.start()
 			print(Fore.MAGENTA + self.item.center(150))
 			for m in self.sold:
