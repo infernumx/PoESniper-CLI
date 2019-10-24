@@ -15,6 +15,8 @@
 > identifier : Unique identifier at the end of your trade URL (https://www.pathofexile.com/trade/exchange/Blight/IDENTIFIER)
  
 > max_price : The highest price you're willing to buy at per singular item
+
+> min_profit : The minimum profit to display (margin * item count)
  
 > resale : Price you're flipping at, used to determine profit margin (resale - price)
  
