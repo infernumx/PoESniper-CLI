@@ -22,6 +22,10 @@
  
 > interval : Interval at which to refresh the page to scan for new results (default: 15)
 
+* Start cmder
+* Copy/paste the directory of PoESniper and do `cd "<directory here>"`
+* run `python PoESniper.py`
+
 ## Commands
 > `block <user>` : Blacklists a user from displaying in search results
 
