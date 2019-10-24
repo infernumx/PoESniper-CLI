@@ -3,7 +3,7 @@ import blacklist
 import json
 import datetime
 import time
-from threading import Thread
+from threading import Thread, Lock
 from playsound import playsound
 from bs4 import BeautifulSoup
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -14,6 +14,8 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
+
+output_lock = Lock()
 
 def tonumber(i):
 	try:
@@ -54,6 +56,7 @@ class LinkWatcher():
 		self.config = config
 		self.interval = interval
 		self.driver = None
+		self.sold = []
 		self.cache = []
 
 		self.start()
@@ -79,7 +82,8 @@ class LinkWatcher():
 		self.driver.delete_all_cookies()
 		self.driver.get(self.link)
 		WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'per-have')))
-		time.sleep(0.15) # safety
+		self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+		time.sleep(0.5) # safety
 		soup = BeautifulSoup(self.driver.page_source, 'html.parser')
 
 		scanned, tmp_cache = [], []
@@ -117,7 +121,7 @@ class LinkWatcher():
 				if cached_block['ign'] == block['ign']:
 					cached = True
 					if cached_block['margin'] != block['margin']:
-						print(Fore.YELLOW + Style.BRIGHT + block['ign'] + ' Has updated their price for ' + self.item)
+						self.sold.append(Fore.CYAN + Style.BRIGHT + block['ign'] + ' Has updated their price for ' + self.item)
 						self.cache[i] = block
 						scanned.append(block)
 						break
@@ -141,7 +145,7 @@ class LinkWatcher():
 						break
 
 				if not found:
-					print(Fore.YELLOW + Style.BRIGHT + '{} Has sold their {}.'.format(cached_block['ign'], self.item) + Style.RESET_ALL)
+					self.sold.append(Fore.YELLOW + Style.BRIGHT + '{} Has sold their {}.'.format(cached_block['ign'], self.item) + Style.RESET_ALL)
 
 		self.cache = new_cache or self.cache
 
@@ -151,6 +155,8 @@ class LinkWatcher():
 		self.output(self.cache, force_ding=False)
 
 	def output(self, scanned, force_ding=True):
+		global output_lock
+		output_lock.acquire()
 		global links, counter
 		scanned.sort(reverse=True, key=lambda v : v['margin'])
 		whispers = []
@@ -169,22 +175,26 @@ class LinkWatcher():
 		longest_whisper = whispers and whispers[0][1] or 0
 
 		counter -= 1
-		if counter <= 0 and whispers:
+		if counter <= 0 and whispers or self.sold:
 			counter = links
 			print(Fore.RED + '-' * 150 + Style.RESET_ALL)
 
-		if whispers:
+		if whispers or self.sold:
 			if self.init:
 				# don't play sound if initializing
 				self.init = False
-			elif force_ding:
+			elif force_ding and whispers:
 				def sound():
 					playsound('ding.mp3')
 				thread = Thread(target=sound)
 				thread.start()
-			print(Fore.MAGENTA + block['item_name'].center(150))
+			print(Fore.MAGENTA + self.item.center(150))
+			for m in self.sold:
+				print(m)
+			self.sold = []
 
 		for whisper, whisper_length, block in whispers:
 			fore = blacklist.find(block['ign']) and Fore.RED or Fore.GREEN
 			profit_str = 'PROFIT: ' + str(block['margin'])
 			print(fore + whisper.ljust(145 - len(profit_str) - count_hangul(block['ign'])) + profit_str + Style.RESET_ALL)
+		output_lock.release()
