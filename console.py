@@ -5,6 +5,7 @@ import os
 import init_sniper
 from libs import PoENinja
 import math
+import signal
 import init_sniper
 
 console_thread = None
@@ -19,7 +20,7 @@ def __blacklist(name):
 	blacklist.add(name)
 	log_cmd('{} added to blacklist.'.format(name))
 
-def __view_blacklist(raw_arg):
+def __view_blacklist(raw_arg=None):
 	"""
 	View who's currently blocked on the blacklist
 	"""
@@ -29,25 +30,25 @@ def __view_blacklist(raw_arg):
 	else:
 		log_cmd('Empty.')
 
-def __exit(raw_arg):
+def __exit(raw_arg=None):
 	"""
 	Exits the program and cleans up selenium browsers
 	"""
 	init_sniper.stop()
 	os._exit(0)
 
-def __clear_blacklist(raw_arg):
+def __clear_blacklist(raw_arg=None):
 	"""
 	Clears the blacklist
 	"""
 	blacklist.clear()
 	log_cmd('Blacklist cleared')
 
-def __exalt(raw_arg):
+def __exalt(raw_arg=None):
 	"""
 	Converts chaos into exalts
 	"""
-	chaos = int(raw_arg)
+	chaos = int(raw_arg=None)
 	exa_price = PoENinja.GetCurrencyData('Blight').get('Exalted Orb')
 	if exa_price:
 		exa_price = exa_price['chaosEquivalent']
@@ -55,14 +56,14 @@ def __exalt(raw_arg):
 		remainder = (chaos / exa_price) - price
 		log_cmd('{} Exalted Orb, {} Chaos Orb'.format(price, math.floor(exa_price * remainder + 0.5)))
 
-def __redisplay(raw_arg):
+def __redisplay(raw_arg=None):
 	"""
 	Re-displays the current offers all at once
 	"""
 	init_sniper.redisplay()
 	log_cmd('Redisplay finished.')
 
-def __commands(raw_arg):
+def __commands(raw_arg=None):
 	"""
 	Displays all available commands for use
 	"""
@@ -79,15 +80,23 @@ commands = {
 	'commands': __commands
 }
 
+def keyboardInterruptHandler(signal, frame):
+    __exit()
+
+signal.signal(signal.SIGINT, keyboardInterruptHandler)
+
 def start():
 	def scanner():
 		while True:
-			__input = input().split(' ')
-			func = commands.get(__input[0])
-			if func:
-				print(Fore.CYAN + '> Command Given: ' + __input[0] + Style.RESET_ALL)
-				func(' '.join(__input[1:]))
-			else:
-				print(Fore.CYAN + '> Invalid Command.' + Style.RESET_ALL)
+			try:
+				__input = input().split(' ')
+				func = commands.get(__input[0])
+				if func:
+					print(Fore.CYAN + '> Command Given: ' + __input[0] + Style.RESET_ALL)
+					func(' '.join(__input[1:]))
+				else:
+					print(Fore.CYAN + '> Invalid Command.' + Style.RESET_ALL)
+			except (KeyboardInterrupt, SystemExit, EOFError):
+				__exit()
 	console_thread = Thread(target=scanner)
 	console_thread.start()

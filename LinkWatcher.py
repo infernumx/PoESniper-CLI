@@ -71,21 +71,25 @@ class LinkWatcher():
 		self.driver.quit()
 
 	def scan(self):
-		if self.driver is None:
-			options = webdriver.ChromeOptions()
-			options.add_argument('--unlimited-storage')
-			options.add_argument('--disable-gpu') 
-			options.add_argument('--headless') 
-			options.add_argument('--log-level=3')
-			self.driver = webdriver.Chrome(executable_path='./resources/chromedriver.exe', options=options, service_args=['--webdriver-loglevel=ERROR'])
-		else:
-			self.driver.execute_script("location.reload(true);")
-		self.driver.delete_all_cookies()
-		self.driver.get(self.link)
-		WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'per-have')))
-		self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-		time.sleep(0.5) # safety
-		soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+		try:
+			if self.driver is None:
+				options = webdriver.ChromeOptions()
+				options.add_argument('--unlimited-storage')
+				options.add_argument('--disable-gpu') 
+				options.add_argument('--headless') 
+				options.add_argument('--log-level=3')
+				self.driver = webdriver.Chrome(executable_path='./resources/chromedriver.exe', options=options, service_args=['--webdriver-loglevel=ERROR'])
+			else:
+				self.driver.execute_script("location.reload(true);")
+			self.driver.delete_all_cookies()
+			self.driver.get(self.link)
+			WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'per-have')))
+			self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+			time.sleep(0.5) # safety
+			soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+		except Exception as e:
+			print('Exception occurred, this is normal if you sent a keyboard interrupt or SIGINT to the program.'.format(type(e).__name__, e))
+			return
 
 		scanned, tmp_cache = [], []
 
