@@ -100,10 +100,6 @@ class LinkWatcher():
 
 			block['margin'] = (self.config['resale'] - block['price']) * block['stock']
 
-			if blacklist.find(block['ign']):
-				print(Fore.RED + block['ign'] + ' is on the blacklist, skipped.' + Style.RESET_ALL)
-				continue 
-
 			if (block['price'] > self.config['max_price'] or
 				self.config.get('min_stock') and block['stock'] < self.config['min_stock'] or
 				self.config.get('min_profit') and block['margin'] < self.config['min_profit']):
@@ -172,5 +168,6 @@ class LinkWatcher():
 			print(Fore.MAGENTA + block['item_name'].center(150))
 
 		for whisper, whisper_length, block in whispers:
+			fore = blacklist.find(block['ign']) and Fore.RED or Fore.GREEN
 			profit_str = 'PROFIT: ' + str(block['margin'])
-			print(Fore.GREEN + whisper.ljust(145 - len(profit_str) - count_hangul(block['ign'])) + profit_str + Style.RESET_ALL)
+			print(fore + whisper.ljust(145 - len(profit_str) - count_hangul(block['ign'])) + profit_str + Style.RESET_ALL)
