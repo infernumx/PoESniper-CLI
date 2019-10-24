@@ -193,7 +193,7 @@ class LinkWatcher():
 					playsound('resources/ding.mp3')
 				thread = Thread(target=ding)
 				thread.start()
-			print(Fore.MAGENTA + self.item.center(150))
+			print(Fore.MAGENTA + self.item.center(150) + Style.RESET_ALL)
 			for m in self.sold:
 				print(m)
 			self.sold = []
