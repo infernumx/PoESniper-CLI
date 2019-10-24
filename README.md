@@ -25,10 +25,4 @@
 * Start cmder
 * Copy/paste the directory of PoESniper and do `cd "<directory here>"`
 * run `python PoESniper.py`
-
-## Commands
-> `block <user>` : Blacklists a user from displaying in search results
-
-> `view` : Shows current blacklisted users
-
-> `clear` : Resets the entire blacklist
+* Type `commands` and press enter to view available commands
