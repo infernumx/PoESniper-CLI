@@ -2,6 +2,9 @@ import requests
 import blacklist
 import json
 import datetime
+import time
+from threading import Thread
+from playsound import playsound
 from bs4 import BeautifulSoup
 from apscheduler.schedulers.background import BackgroundScheduler
 from selenium import webdriver
@@ -45,6 +48,7 @@ counter = 0
 
 class LinkWatcher():
 	def __init__(self, item, identifier, config, interval=15):
+		self.init = True
 		self.link = 'https://www.pathofexile.com/trade/exchange/Blight/' + identifier
 		self.item = item
 		self.config = config
@@ -75,6 +79,7 @@ class LinkWatcher():
 		self.driver.delete_all_cookies()
 		self.driver.get(self.link)
 		WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'per-have')))
+		time.sleep(0.15) # safety
 		soup = BeautifulSoup(self.driver.page_source, 'html.parser')
 
 		scanned, tmp_cache = [], []
@@ -112,7 +117,7 @@ class LinkWatcher():
 				if cached_block['ign'] == block['ign']:
 					cached = True
 					if cached_block['margin'] != block['margin']:
-						print('Updating IGN: ' + block['ign'])
+						print(Fore.YELLOW + Style.BRIGHT + block['ign'] + ' Has updated their price for ' + self.item)
 						self.cache[i] = block
 						scanned.append(block)
 						break
@@ -136,16 +141,16 @@ class LinkWatcher():
 						break
 
 				if not found:
-					print(Fore.YELLOW + Style.BRIGHT + '{} Has sold their item.'.format(cached_block['ign']) + Style.RESET_ALL)
+					print(Fore.YELLOW + Style.BRIGHT + '{} Has sold their {}.'.format(cached_block['ign'], self.item) + Style.RESET_ALL)
 
 		self.cache = new_cache or self.cache
 
 		self.output(scanned)
 
 	def redisplay(self):
-		self.output(self.cache)
+		self.output(self.cache, force_ding=False)
 
-	def output(self, scanned):
+	def output(self, scanned, force_ding=True):
 		global links, counter
 		scanned.sort(reverse=True, key=lambda v : v['margin'])
 		whispers = []
@@ -169,6 +174,14 @@ class LinkWatcher():
 			print(Fore.RED + '-' * 150 + Style.RESET_ALL)
 
 		if whispers:
+			if self.init:
+				# don't play sound if initializing
+				self.init = False
+			elif force_ding:
+				def sound():
+					playsound('ding.mp3')
+				thread = Thread(target=sound)
+				thread.start()
 			print(Fore.MAGENTA + block['item_name'].center(150))
 
 		for whisper, whisper_length, block in whispers:
