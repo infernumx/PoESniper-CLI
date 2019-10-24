@@ -1,6 +1,6 @@
 import requests
 import json
-from JSONFilter import keep, delete
+from libs.JSONFilter import keep, delete
 
 def GetChangeId():
 	r = requests.get('https://poe.ninja/api/Data/GetStats')

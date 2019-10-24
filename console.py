@@ -3,7 +3,7 @@ from threading import Thread
 import blacklist
 import os
 import init_sniper
-import PoENinja
+from libs import PoENinja
 import math
 import init_sniper
 

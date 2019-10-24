@@ -77,7 +77,7 @@ class LinkWatcher():
 			options.add_argument('--disable-gpu') 
 			options.add_argument('--headless') 
 			options.add_argument('--log-level=3')
-			self.driver = webdriver.Chrome(executable_path='./chromedriver.exe', options=options, service_args=['--webdriver-loglevel=ERROR'])
+			self.driver = webdriver.Chrome(executable_path='./resources/chromedriver.exe', options=options, service_args=['--webdriver-loglevel=ERROR'])
 		else:
 			self.driver.execute_script("location.reload(true);")
 		self.driver.delete_all_cookies()
