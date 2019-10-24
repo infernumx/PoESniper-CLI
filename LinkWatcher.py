@@ -44,8 +44,9 @@ links = 0
 counter = 0
 
 class LinkWatcher():
-	def __init__(self, identifier, config, interval=15):
+	def __init__(self, item, identifier, config, interval=15):
 		self.link = 'https://www.pathofexile.com/trade/exchange/Blight/' + identifier
+		self.item = item
 		self.config = config
 		self.interval = interval
 		self.driver = None
@@ -140,6 +141,9 @@ class LinkWatcher():
 		self.cache = new_cache or self.cache
 
 		self.output(scanned)
+
+	def redisplay(self):
+		self.output(self.cache)
 
 	def output(self, scanned):
 		global links, counter

@@ -1,8 +1,14 @@
+import os
+
 blacklist = []
 
-with open('blacklist.txt') as f:
-	for line in f:
-		blacklist.append(line)
+if not os.path.exists('blacklist.txt'):
+	with open('blacklist.txt', 'w') as f:
+		pass
+else:
+	with open('blacklist.txt') as f:
+		for line in f:
+			blacklist.append(line)
 
 def get():
 	global blacklist
