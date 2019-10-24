@@ -1,4 +1,3 @@
-from LinkWatcher import LinkWatcher
 import console
 import init_sniper
 
