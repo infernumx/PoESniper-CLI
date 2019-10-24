@@ -21,3 +21,10 @@
 > resale : Price you're flipping at, used to determine profit margin (resale - price)
  
 > interval : Interval at which to refresh the page to scan for new results (default: 15)
+
+## Commands
+> `block <user>` : Blacklists a user from displaying in search results
+
+> `view` : Shows current blacklisted users
+
+> `clear` : Resets the entire blacklist
