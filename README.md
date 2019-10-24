@@ -12,7 +12,7 @@
 ## Instructions
 * Open up `PoESniper.py`
 * Edit `config` variable to suit which items you'd like to snipe
-> identifier : Unique identifier at the end of your trade URL (https://www.pathofexile.com/trade/exchange/Blight/<IDENTIFIER>)
+> identifier : Unique identifier at the end of your trade URL (https://www.pathofexile.com/trade/exchange/Blight/IDENTIFIER)
  
 > max_price : The highest price you're willing to buy at per singular item
  
