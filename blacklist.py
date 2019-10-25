@@ -4,10 +4,10 @@ from libs import colortext
 blacklist = []
 
 if not os.path.exists('blacklist.txt'):
-    with open('blacklist.txt', 'w') as f:
+    with open('blacklist.txt', 'w', encoding='utf-8') as f:
         pass
 else:
-    with open('blacklist.txt') as f:
+    with open('blacklist.txt', 'r', encoding='utf-8') as f:
         for line in f:
             blacklist.append(line.strip())
 
@@ -49,5 +49,5 @@ def remove(name, do_save=True):
 
 def save():
     global blacklist
-    with open('blacklist.txt', 'w+') as f:
+    with open('blacklist.txt', 'w+', encoding='utf-8') as f:
         f.write('\n'.join(name for name in blacklist))

@@ -19,7 +19,6 @@ def __unblock(name):
     """
     Unblocks user from blacklist
     """
-    print(name)
     blacklist.remove(name)
     log_cmd('{} removed from the blacklist'.format(name))
 
