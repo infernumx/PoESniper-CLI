@@ -1,5 +1,5 @@
 import os
-
+from libs import colortext
 
 blacklist = []
 
@@ -9,7 +9,7 @@ if not os.path.exists('blacklist.txt'):
 else:
     with open('blacklist.txt') as f:
         for line in f:
-            blacklist.append(line)
+            blacklist.append(line.strip())
 
 
 def get():
@@ -27,17 +27,25 @@ def clear():
 def find(name):
     global blacklist
     for _name in blacklist:
-        if _name.strip() == name:
+        if _name == name:
             return True
     return False
 
 
 def add(name, do_save=True):
     global blacklist
-    blacklist.append(name)
+    blacklist.append(name.strip())
     if do_save:
         save()
 
+def remove(name, do_save=True):
+    global blacklist
+    try:
+        blacklist.remove(name)
+    except:
+        print(colortext.red('Could not find ' + name + ' in blacklist.'))
+    if do_save:
+        save()
 
 def save():
     global blacklist

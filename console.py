@@ -15,8 +15,16 @@ console_thread = None
 def log_cmd(cmd):
     print(colortext.red('>> ' + str(cmd), bright=True))
 
+def __unblock(name):
+    """
+    Unblocks user from blacklist
+    """
+    print(name)
+    blacklist.remove(name)
+    log_cmd('{} removed from the blacklist'.format(name))
 
-def __blacklist(name):
+
+def __block(name):
     """
     Makes their name red in display instead of green to show potential
     pricefixers/unresponsive players
@@ -31,7 +39,7 @@ def __view_blacklist(raw_arg=None):
     """
     bl = blacklist.get()
     if bl:
-        log_cmd(', '.join(s for s in blacklist.get()))
+        log_cmd(', '.join(s.replace('\n', '') for s in blacklist.get()))
     else:
         log_cmd('Empty.')
 
@@ -87,7 +95,8 @@ def __commands(raw_arg=None):
 
 
 commands = {
-    'block': __blacklist,
+    'block': __block,
+    'unblock': __unblock,
     'view': __view_blacklist,
     'clear': __clear_blacklist,
     'exit': __exit,
