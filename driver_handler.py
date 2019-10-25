@@ -21,9 +21,12 @@ from libs import deepnodesearcher as nodesearch
 import logging
 
 
+DEBUGGING = True
+
 logger = logging.getLogger('apscheduler')
-logger.setLevel(level=logging.CRITICAL)
-logger.disabled = True
+if not DEBUGGING:
+    logger.setLevel(level=logging.CRITICAL)
+    logger.disabled = True
 output_lock = Lock()
 TRADE_URL = 'https://www.pathofexile.com/trade/exchange/Blight/'
 
