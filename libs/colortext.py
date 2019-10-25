@@ -28,7 +28,8 @@ def blue(txt, bright=False):
 
 def yellow(txt, bright=False):
     brightness = bright and Style.BRIGHT or Style.NORMAL
-    return Fore.YELLOW + brightness + txt + style.RESET_ALL
+    return Fore.YELLOW + brightness + txt + Style.RESET_ALL
+
 
 color_table = {
     'yellow': yellow,

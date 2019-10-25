@@ -21,7 +21,7 @@ from libs import deepnodesearcher as nodesearch
 import logging
 
 
-DEBUGGING = True
+DEBUGGING = False
 
 logger = logging.getLogger('apscheduler')
 if not DEBUGGING:
