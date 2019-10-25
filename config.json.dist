@@ -10,8 +10,7 @@
 				"max_price": 1,
 				"resale": 4,
 				"min_profit": 2
-			},
-			"interval": 15
+			}
 		},
 	]
 }
