@@ -71,7 +71,7 @@ class DriverHandler():
         options = webdriver.ChromeOptions()
         options.add_argument('--unlimited-storage')
         options.add_argument('--disable-gpu')
-        #options.add_argument('--headless')
+        options.add_argument('--headless')
         options.add_argument('--log-level=3')
         self.driver = webdriver.Chrome(
             executable_path='./resources/chromedriver.exe',
@@ -267,7 +267,6 @@ class DriverHandler():
                     scanned.append(block)
 
                 tmp_cache.append(block)
-                print('Appending IGN ' + block['ign'] + ' for item ' + tab_handler.item)
 
             if DEBUGGING:
                 colortext.output('Parsed ' + str(len(tmp_cache)) + ' offers.', 'logging')
