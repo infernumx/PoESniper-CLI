@@ -113,9 +113,6 @@ class DriverHandler():
 
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
 
-            with open('dump-'+identifier+'.html', 'w', encoding='utf-8') as f:
-                f.write(soup.prettify())
-
             for div in soup.find_all('div', class_='row exchange'):
                 details = div.find('div', class_='middle details')
                 info = div.find('div', class_='right').find('div', class_='details').find('div', class_='info')
