@@ -16,6 +16,11 @@ def magenta(txt, bright=False):
     return Fore.MAGENTA + brightness + txt + Style.RESET_ALL
 
 
+def green(txt, bright=False):
+    brightness = bright and Style.BRIGHT or Style.NORMAL
+    return Fore.GREEN + brightness + txt + Style.RESET_ALL
+
+
 def blue(txt, bright=False):
     brightness = bright and Style.BRIGHT or Style.NORMAL
     return Fore.BLUE + brightness + txt + Style.RESET_ALL

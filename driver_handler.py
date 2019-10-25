@@ -44,7 +44,7 @@ def ding():
 
 
 class TabHandler():
-    def __init__(self, item, identifier, config, interval=15):
+    def __init__(self, item, identifier, config):
         self.item = item
         self.config = config
         self.sold = []
@@ -92,7 +92,7 @@ class DriverHandler():
             self.filter_links,
             'interval',
             id='scanner',
-            seconds=15,
+            seconds=5,
             next_run_time=datetime.datetime.now()
         )
         self.task_scheduler.start()
@@ -112,18 +112,6 @@ class DriverHandler():
                 self.tab_handlers[identifier].set_handler_id(0)
                 begin = False
             self.driver.get(TRADE_URL + identifier)
-            self.wait_and_scroll()
-
-    def wait_and_scroll(self):
-        WebDriverWait(self.driver, 10).until(
-            EC.visibility_of_element_located(
-                (By.CLASS_NAME, 'per-have')
-            )
-        )
-        self.driver.execute_script(
-            "window.scrollTo(0, document.body.scrollHeight);"
-        )
-        time.sleep(0.5)  # safety
 
     def filter_links(self):
         for identifier, tab_handler in self.tab_handlers.items():
@@ -135,7 +123,15 @@ class DriverHandler():
             # Refresh if we're past initialization
             if not self.init:
                 self.driver.get(self.driver.current_url)
-                self.wait_and_scroll()
+                WebDriverWait(self.driver, 10).until(
+                    EC.visibility_of_element_located(
+                        (By.CLASS_NAME, 'per-have')
+                    )
+                )
+                self.driver.execute_script(
+                    "window.scrollTo(0, document.body.scrollHeight);"
+                )
+                time.sleep(0.5)  # safety
 
             scanned, tmp_cache = [], []
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
@@ -216,36 +212,35 @@ class DriverHandler():
                     block['stock']
                 )
 
-                # Use +1 to avoid comparison fail if not defined by config
-                min_stock = tab_handler.min_stock or block['stock'] + 1
-                min_profit = tab_handler.min_profit or block['margin'] + 1
+                min_stock = tab_handler.min_stock
+                min_profit = tab_handler.min_profit
 
                 # Filter out prices higher than required by config
                 if (block['price'] > tab_handler.config['max_price'] or
-                        block['stock'] < min_stock or
-                        block['margin'] < min_profit):
+                        min_stock and block['stock'] < min_stock or
+                        min_profit and block['margin'] < min_profit):
                     continue
 
                 cached = False
                 # Update cache if profit margin changes
                 for i, cached_block in enumerate(tab_handler.cache):
-                    cached = True
-                    if (cached_block['ign'] != block['ign'] and
-                            cached_block['margin'] == block['margin']):
-                        continue
+                    if cached_block['ign'] == block['ign']:
+                        cached = True
+                        if cached_block['margin'] == block['margin']:
+                            continue
 
-                    tab_handler.sold.append(
-                        colortext.cyan(
-                            '{} Has updated their price for {}'.format(
-                                block['ign'],
-                                tab_handler.item
-                            ),
-                            bright=True
+                        tab_handler.sold.append(
+                            colortext.cyan(
+                                '{} Has updated their price for {}'.format(
+                                    block['ign'],
+                                    tab_handler.item
+                                ),
+                                bright=True
+                            )
                         )
-                    )
-                    tab_handler.cache[i] = block
-                    scanned.append(block)
-                    break
+                        tab_handler.cache[i] = block
+                        scanned.append(block)
+                        break
 
                 # Insert into the cache if they're not cached already
                 if not cached:
@@ -277,7 +272,6 @@ class DriverHandler():
                         )
 
             tab_handler.cache = new_cache or tab_handler.cache
-
             self.output(tab_handler, scanned)
         self.init = False
 
@@ -293,7 +287,7 @@ class DriverHandler():
 
         # Format whispers and determine longest whisper for ljust length
         for block in scanned:
-            whisper = ('@{} Hi, I would like to buy your'
+            whisper = ('@{} Hi, I would like to buy your '
                        '{} {} for {} {} in Blight.').format(
                         block['ign'],
                         block['stock'],
@@ -326,8 +320,6 @@ class DriverHandler():
 
         # Ouptut whispers
         for whisper, whisper_length, block in whispers:
-            fore = (blacklist.find(block['ign']) and
-                    colortext.red or colortext.green)
             profit_str = 'PROFIT: ' + str(block['margin'])
             # Fix width of korean characters
             hangul_count = hangul.count_hangul(
@@ -336,7 +328,10 @@ class DriverHandler():
             whisper = whisper.ljust(
                 145 - len(profit_str) - hangul_count
             )
-            print(fore('{} {}', whisper, profit_str))
+            if blacklist.find(block['ign']):
+                print(colortext.red('{} {}'.format(whisper, profit_str)))
+            else:
+                print(colortext.green('{} {}'.format(whisper, profit_str)))
         output_lock.release()
 
     def stop(self):
