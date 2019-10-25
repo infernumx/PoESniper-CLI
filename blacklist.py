@@ -23,7 +23,7 @@ def clear():
 def find(name):
 	global blacklist
 	for _name in blacklist:
-		if _name == name:
+		if _name.strip() == name:
 			return True
 	return False
 
