@@ -80,7 +80,7 @@ class DriverHandler():
             key = item_filter['identifier']
             self.tab_handlers[key] = TabHandler(**item_filter)
 
-        print(colortext.red('Loading links'))
+        colortext.output('Loading Links', 'logging')
 
         self.load_links([
             item_filter['identifier']
@@ -112,6 +112,18 @@ class DriverHandler():
                 self.tab_handlers[identifier].set_handler_id(0)
                 begin = False
             self.driver.get(TRADE_URL + identifier)
+            self.wait_and_scroll()
+
+    def wait_and_scroll(self):
+        WebDriverWait(self.driver, 10).until(
+            EC.visibility_of_element_located(
+                (By.CLASS_NAME, 'per-have')
+            )
+        )
+        self.driver.execute_script(
+            "window.scrollTo(0, document.body.scrollHeight);"
+        )
+        time.sleep(0.5)  # safety
 
     def filter_links(self):
         for identifier, tab_handler in self.tab_handlers.items():
@@ -123,15 +135,7 @@ class DriverHandler():
             # Refresh if we're past initialization
             if not self.init:
                 self.driver.get(self.driver.current_url)
-                WebDriverWait(self.driver, 10).until(
-                    EC.visibility_of_element_located(
-                        (By.CLASS_NAME, 'per-have')
-                    )
-                )
-                self.driver.execute_script(
-                    "window.scrollTo(0, document.body.scrollHeight);"
-                )
-                time.sleep(0.5)  # safety
+                self.wait_and_scroll()
 
             scanned, tmp_cache = [], []
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
@@ -230,12 +234,12 @@ class DriverHandler():
                             continue
 
                         tab_handler.sold.append(
-                            colortext.cyan(
+                            colortext.generate(
                                 '{} Has updated their price for {}'.format(
                                     block['ign'],
                                     tab_handler.item
                                 ),
-                                bright=True
+                                'listing-update'
                             )
                         )
                         tab_handler.cache[i] = block
@@ -262,12 +266,12 @@ class DriverHandler():
 
                     if not found:
                         tab_handler.sold.append(
-                            colortext.yellow(
+                            colortext.generate(
                                 '{} Has sold their {}.'.format(
                                     cached_block['ign'],
                                     tab_handler.item
                                 ),
-                                bright=True
+                                'listing-remove'
                             )
                         )
 
@@ -302,7 +306,7 @@ class DriverHandler():
 
         # Output item filter separator
         if whispers or tab_handler.sold:
-            print(colortext.red('-' * 150))
+            colortext.output('-' * 150, 'logging')
 
         # Output item name & ding
         if whispers or tab_handler.sold:
@@ -312,7 +316,7 @@ class DriverHandler():
                     not self.init):
                 ding()
 
-            print(colortext.magenta(tab_handler.item.center(150)))
+            colortext.output(tab_handler.item.center(150), 'item-name')
 
             for m in tab_handler.sold:
                 print(m)
@@ -325,13 +329,16 @@ class DriverHandler():
             hangul_count = hangul.count_hangul(
                 block['ign']
             )
-            whisper = whisper.ljust(
-                145 - len(profit_str) - hangul_count
+            whisper =  '{} {}'.format(
+                whisper.ljust(
+                    145 - len(profit_str) - hangul_count
+                ),
+                profit_str
             )
             if blacklist.find(block['ign']):
-                print(colortext.red('{} {}'.format(whisper, profit_str)))
+                colortext.output(whisper, 'blocked-whisper')
             else:
-                print(colortext.green('{} {}'.format(whisper, profit_str)))
+                colortext.output(whisper, 'whisper')
         output_lock.release()
 
     def stop(self):

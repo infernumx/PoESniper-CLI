@@ -13,7 +13,7 @@ console_thread = None
 
 
 def log_cmd(cmd):
-    print(colortext.red('>> ' + str(cmd), bright=True))
+    colortext.output('>> ' + str(cmd), 'console-logging')
 
 def __unblock(name):
     """
@@ -120,10 +120,10 @@ def start():
                 __input = input().split(' ')
                 func = commands.get(__input[0])
                 if func:
-                    print(colortext.cyan('> Command Given: ' + __input[0]))
+                    colortext.output('> Command Given: ' + __input[0], 'console-command')
                     func(' '.join(__input[1:]))
                 else:
-                    print(colortext.cyan('> Invalid Command.'))
+                    colortext.output('> Invalid Command.', 'console-command')
             except (KeyboardInterrupt, SystemExit, EOFError):
                 __exit()
     console_thread = Thread(target=scanner)

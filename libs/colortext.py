@@ -1,5 +1,5 @@
 from colorama import Fore, Back, Style
-
+from configloader import config as SNIPER_CONFIG
 
 def red(txt, bright=False):
     brightness = bright and Style.BRIGHT or Style.NORMAL
@@ -29,3 +29,36 @@ def blue(txt, bright=False):
 def yellow(txt, bright=False):
     brightness = bright and Style.BRIGHT or Style.NORMAL
     return Fore.YELLOW + brightness + txt + style.RESET_ALL
+
+color_table = {
+    'yellow': yellow,
+    'blue': blue,
+    'green': green,
+    'magenta': magenta,
+    'cyan': cyan,
+    'red': red
+}
+
+def get_config_color(msg_type):
+    return SNIPER_CONFIG['general-config']['colors'][msg_type]
+
+
+def get_color_func(msg_type):
+    return color_table[get_config_color(msg_type)['color']]
+
+
+def generate(txt, msg_type):
+    color_func = get_color_func(msg_type)
+    return color_func(
+        txt,
+        bright=get_config_color(msg_type)['bright']
+    )
+
+
+def output(txt, msg_type):
+    color_func = get_color_func(msg_type)
+    print(color_func(
+            txt,
+            bright=get_config_color(msg_type)['bright']
+        )
+    )
