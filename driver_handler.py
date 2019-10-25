@@ -71,8 +71,7 @@ class DriverHandler():
         options = webdriver.ChromeOptions()
         options.add_argument('--unlimited-storage')
         options.add_argument('--disable-gpu')
-        if not DEBUGGING:
-            options.add_argument('--headless')
+        #options.add_argument('--headless')
         options.add_argument('--log-level=3')
         self.driver = webdriver.Chrome(
             executable_path='./resources/chromedriver.exe',
@@ -96,7 +95,7 @@ class DriverHandler():
             self.filter_links,
             'interval',
             id='scanner',
-            seconds=5,
+            seconds=6,
             next_run_time=datetime.datetime.now()
         )
         self.task_scheduler.start()
@@ -140,6 +139,9 @@ class DriverHandler():
             if not self.init:
                 self.driver.get(self.driver.current_url)
                 self.wait_and_scroll()
+
+            if DEBUGGING:
+                colortext.output('Page Refreshed for ' + tab_handler.item, 'logging')
 
             scanned, tmp_cache = [], []
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
@@ -223,11 +225,13 @@ class DriverHandler():
                 min_stock = tab_handler.min_stock
                 min_profit = tab_handler.min_profit
 
+                verify_continue = False
+
                 # Filter out prices higher than required by config
                 if (block['price'] > tab_handler.config['max_price'] or
                         min_stock and block['stock'] < min_stock or
                         min_profit and block['margin'] < min_profit):
-                    continue
+                    verify_continue = True
 
                 cached = False
                 # Update cache if profit margin changes
@@ -246,9 +250,16 @@ class DriverHandler():
                                 'listing-update'
                             )
                         )
-                        tab_handler.cache[i] = block
-                        scanned.append(block)
+
+                        if not verify_continue:
+                            tab_handler.cache[i] = block
+                            scanned.append(block)
+                        else:
+                            del tab_handler.cache[i]
                         break
+
+                if verify_continue:
+                    continue
 
                 # Insert into the cache if they're not cached already
                 if not cached:
@@ -256,6 +267,10 @@ class DriverHandler():
                     scanned.append(block)
 
                 tmp_cache.append(block)
+                print('Appending IGN ' + block['ign'] + ' for item ' + tab_handler.item)
+
+            if DEBUGGING:
+                colortext.output('Parsed ' + str(len(tmp_cache)) + ' offers.', 'logging')
 
             # Delete from cache if they were not scanned, aka item was sold
             new_cache = []
@@ -278,6 +293,8 @@ class DriverHandler():
                                 'listing-remove'
                             )
                         )
+            else:
+                tab_handler.cache = []
 
             tab_handler.cache = new_cache or tab_handler.cache
             self.output(tab_handler, scanned)
