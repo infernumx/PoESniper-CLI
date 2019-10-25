@@ -71,7 +71,8 @@ class DriverHandler():
         options = webdriver.ChromeOptions()
         options.add_argument('--unlimited-storage')
         options.add_argument('--disable-gpu')
-        options.add_argument('--headless')
+        if not DEBUGGING:
+            options.add_argument('--headless')
         options.add_argument('--log-level=3')
         self.driver = webdriver.Chrome(
             executable_path='./resources/chromedriver.exe',
