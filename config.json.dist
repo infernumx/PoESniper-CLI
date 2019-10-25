@@ -1,8 +1,8 @@
 {
-	"general_config": {
-		"ding_sound": false
+	"general-config": {
+		"ding": false
 	},
-	"item_filters": [
+	"item-filters": [
 		{
 			"item": "Jagged Fossil",
 			"identifier": "mwjqKaS6",
