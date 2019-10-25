@@ -1,21 +1,19 @@
-from LinkWatcher import LinkWatcher
+from driver_handler import DriverHandler
 import time
 
 
 watchers = []
+driver = None
 
 
 def init(config):
-    for link_config in config:
-        watchers.append(LinkWatcher(**link_config))
-        time.sleep(0.5)
+    global driver
+    driver = DriverHandler(config)
 
 
 def redisplay():
-    for watcher in watchers:
-        watcher.redisplay()
+    driver.redisplay()
 
 
 def stop():
-    for watcher in watchers:
-        watcher.stop()
+    driver.stop()

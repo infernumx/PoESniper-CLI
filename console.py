@@ -56,7 +56,7 @@ def __exalt(raw_arg=None):
     """
     Converts chaos into exalts
     """
-    chaos = int(raw_arg=None)
+    chaos = int(raw_arg)
     exa_price = PoENinja.GetCurrencyData('Blight').get('Exalted Orb')
     if exa_price:
         exa_price = exa_price['chaosEquivalent']
