@@ -1,4 +1,4 @@
-from colorama import Fore, Back, Style 
+from colorama import Fore, Back, Style
 from threading import Thread
 import blacklist
 import os
@@ -7,96 +7,115 @@ from libs import PoENinja
 import math
 import signal
 import init_sniper
+from libs import colortext
 
 console_thread = None
 
+
 def log_cmd(cmd):
-	print(Fore.RED + Style.BRIGHT + '>> ' + str(cmd) + Style.RESET_ALL)
+    print(colortext.red('>> ' + str(cmd), bright=True))
+
 
 def __blacklist(name):
-	"""
-	Makes their name red in display instead of green to show potential pricefixers/unresponsive players
-	"""
-	blacklist.add(name)
-	log_cmd('{} added to blacklist.'.format(name))
+    """
+    Makes their name red in display instead of green to show potential
+    pricefixers/unresponsive players
+    """
+    blacklist.add(name)
+    log_cmd('{} added to blacklist.'.format(name))
+
 
 def __view_blacklist(raw_arg=None):
-	"""
-	View who's currently blocked on the blacklist
-	"""
-	bl = blacklist.get()
-	if bl:
-		log_cmd(', '.join(s for s in blacklist.get()))
-	else:
-		log_cmd('Empty.')
+    """
+    View who's currently blocked on the blacklist
+    """
+    bl = blacklist.get()
+    if bl:
+        log_cmd(', '.join(s for s in blacklist.get()))
+    else:
+        log_cmd('Empty.')
+
 
 def __exit(raw_arg=None):
-	"""
-	Exits the program and cleans up selenium browsers
-	"""
-	init_sniper.stop()
-	os._exit(0)
+    """
+    Exits the program and cleans up selenium browsers
+    """
+    init_sniper.stop()
+    os._exit(0)
+
 
 def __clear_blacklist(raw_arg=None):
-	"""
-	Clears the blacklist
-	"""
-	blacklist.clear()
-	log_cmd('Blacklist cleared')
+    """
+    Clears the blacklist
+    """
+    blacklist.clear()
+    log_cmd('Blacklist cleared')
+
 
 def __exalt(raw_arg=None):
-	"""
-	Converts chaos into exalts
-	"""
-	chaos = int(raw_arg=None)
-	exa_price = PoENinja.GetCurrencyData('Blight').get('Exalted Orb')
-	if exa_price:
-		exa_price = exa_price['chaosEquivalent']
-		price = math.floor(chaos / exa_price)
-		remainder = (chaos / exa_price) - price
-		log_cmd('{} Exalted Orb, {} Chaos Orb'.format(price, math.floor(exa_price * remainder + 0.5)))
+    """
+    Converts chaos into exalts
+    """
+    chaos = int(raw_arg=None)
+    exa_price = PoENinja.GetCurrencyData('Blight').get('Exalted Orb')
+    if exa_price:
+        exa_price = exa_price['chaosEquivalent']
+        price = math.floor(chaos / exa_price)
+        remainder = (chaos / exa_price) - price
+        log_cmd(
+            '{} Exalted Orb, {} Chaos Orb'.format(
+                price,
+                math.floor(exa_price * remainder + 0.5)
+            )
+        )
+
 
 def __redisplay(raw_arg=None):
-	"""
-	Re-displays the current offers all at once
-	"""
-	init_sniper.redisplay()
-	log_cmd('Redisplay finished.')
+    """
+    Re-displays the current offers all at once
+    """
+    init_sniper.redisplay()
+    log_cmd('Redisplay finished.')
+
 
 def __commands(raw_arg=None):
-	"""
-	Displays all available commands for use
-	"""
-	for cmd, func in commands.items():
-		log_cmd('{}: {}'.format(cmd, func.__doc__.strip()))
+    """
+    Displays all available commands for use
+    """
+    for cmd, func in commands.items():
+        log_cmd('{}: {}'.format(cmd, func.__doc__.strip()))
+
 
 commands = {
-	'block': __blacklist,
-	'view': __view_blacklist,
-	'clear': __clear_blacklist,
-	'exit': __exit,
-	'exalt': __exalt,
-	'redisplay': __redisplay,
-	'commands': __commands
+    'block': __blacklist,
+    'view': __view_blacklist,
+    'clear': __clear_blacklist,
+    'exit': __exit,
+    'exalt': __exalt,
+    'redisplay': __redisplay,
+    'commands': __commands
 }
+
 
 def keyboardInterruptHandler(signal, frame):
     __exit()
 
+
 signal.signal(signal.SIGINT, keyboardInterruptHandler)
 
+
 def start():
-	def scanner():
-		while True:
-			try:
-				__input = input().split(' ')
-				func = commands.get(__input[0])
-				if func:
-					print(Fore.CYAN + '> Command Given: ' + __input[0] + Style.RESET_ALL)
-					func(' '.join(__input[1:]))
-				else:
-					print(Fore.CYAN + '> Invalid Command.' + Style.RESET_ALL)
-			except (KeyboardInterrupt, SystemExit, EOFError):
-				__exit()
-	console_thread = Thread(target=scanner)
-	console_thread.start()
+    def scanner():
+        while True:
+            try:
+                __input = input().split(' ')
+                func = commands.get(__input[0])
+                if func:
+                    print(colortext.cyan('> Command Given: ' + __input[0]))
+                    func(' '.join(__input[1:]))
+                else:
+                    print(colortext.cyan('> Invalid Command.'))
+            except (KeyboardInterrupt, SystemExit, EOFError):
+                __exit()
+    console_thread = Thread(target=scanner)
+    console_thread.start()
