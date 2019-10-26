@@ -127,6 +127,14 @@ class DriverHandler():
             "window.scrollTo(0, document.body.scrollHeight);"
         )
         time.sleep(0.5)  # safety
+        self.driver.execute_script(
+            "window.scrollTo(0, document.body.scrollHeight);"
+        )
+        time.sleep(0.5)  # safety
+        self.driver.execute_script(
+            "window.scrollTo(0, document.body.scrollHeight);"
+        )
+        time.sleep(0.5)  # safety
 
     def filter_links(self):
         for identifier, tab_handler in self.tab_handlers.items():
@@ -292,7 +300,16 @@ class DriverHandler():
                                 'listing-remove'
                             )
                         )
-            else:
+            elif not tmp_cache and len(tab_handler.cache) == 1:
+                tab_handler.sold.append(
+                    colortext.generate(
+                        '{} Has sold their {}.'.format(
+                            tab_handler.cache[0]['ign'],
+                            tab_handler.item
+                        ),
+                        'listing-remove'
+                    )
+                )
                 tab_handler.cache = []
 
             tab_handler.cache = new_cache or tab_handler.cache
