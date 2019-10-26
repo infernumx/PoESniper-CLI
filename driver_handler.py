@@ -238,7 +238,9 @@ class DriverHandler():
                 # Filter out prices higher than required by config
                 if (block['price'] > tab_handler.config['max_price'] or
                         min_stock and block['stock'] < min_stock or
-                        min_profit and block['margin'] < min_profit):
+                        min_profit and block['margin'] < min_profit or
+                        blacklist.find(block['ign']) and
+                        not SNIPER_CONFIG['general-config']['display-blocked']):
                     verify_continue = True
 
                 cached = False
@@ -285,12 +287,14 @@ class DriverHandler():
                 for i, cached_block in enumerate(tab_handler.cache):
                     found = False
                     for block in tmp_cache:
-                        if block['ign'] == cached_block['ign']:
+                        if (block['ign'] == cached_block['ign'] and
+                                blacklist.should_display(block['ign'])):
                             new_cache.append(block)
                             found = True
                             break
 
-                    if not found:
+                    if (not found and
+                            blacklist.should_display(cached_block['ign'])):
                         tab_handler.sold.append(
                             colortext.generate(
                                 '{} Has sold their {}.'.format(
@@ -372,7 +376,8 @@ class DriverHandler():
                 ),
                 profit_str
             )
-            if blacklist.find(block['ign']):
+            if (blacklist.find(block['ign']) and
+                    blacklist.should_display(block['ign'])):
                 colortext.output(whisper, 'blocked-whisper')
             else:
                 colortext.output(whisper, 'whisper')

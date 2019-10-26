@@ -1,5 +1,6 @@
 import os
 from libs import colortext
+from configloader import config as SNIPER_CONFIG
 
 blacklist = []
 
@@ -51,3 +52,9 @@ def save():
     global blacklist
     with open('blacklist.txt', 'w+', encoding='utf-8') as f:
         f.write('\n'.join(name for name in blacklist))
+
+
+def should_display(ign):
+    if find(ign):
+        return SNIPER_CONFIG['general-config']['display-blocked']
+    return True
