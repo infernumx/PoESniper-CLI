@@ -1,6 +1,7 @@
 {
 	"general-config": {
 		"ding": true,
+		"display-blocked": false,
 		"colors": {
 			"error": {"color": "red", "bright": true},
 			"whisper": {"color": "green", "bright": false},
