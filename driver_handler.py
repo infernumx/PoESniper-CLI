@@ -14,7 +14,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.keys import Keys
-from configloader import config as SNIPER_CONFIG
+import configloader
 from libs import colortext
 from libs import hangul
 from libs import deepnodesearcher as nodesearch
@@ -240,7 +240,7 @@ class DriverHandler():
                         min_stock and block['stock'] < min_stock or
                         min_profit and block['margin'] < min_profit or
                         blacklist.find(block['ign']) and
-                        not SNIPER_CONFIG['general-config']['display-blocked']):
+                        not configloader.get()['general-config']['display-blocked']):
                     verify_continue = True
 
                 cached = False
@@ -353,7 +353,7 @@ class DriverHandler():
         if whispers or tab_handler.sold:
             if (force_ding and
                     whispers and
-                    SNIPER_CONFIG['general-config']['ding'] and
+                    configloader.get()['general-config']['ding'] and
                     not self.init):
                 ding()
 

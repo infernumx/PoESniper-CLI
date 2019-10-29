@@ -1,7 +1,17 @@
 import json
 
-with open('config.json') as f:
-	config = json.loads(f.read())
+config = None
+
+def load():
+	global config
+	with open('config.json') as f:
+		config = json.loads(f.read())
+
+load()
+
+def get():
+	global config
+	return config
 
 colors = config['general-config']['colors']
 

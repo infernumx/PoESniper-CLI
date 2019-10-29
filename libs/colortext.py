@@ -1,5 +1,6 @@
 from colorama import Fore, Back, Style
-from configloader import config as SNIPER_CONFIG
+import configloader
+
 
 def red(txt, bright=False):
     brightness = bright and Style.BRIGHT or Style.NORMAL
@@ -41,7 +42,7 @@ color_table = {
 }
 
 def get_config_color(msg_type):
-    return SNIPER_CONFIG['general-config']['colors'][msg_type]
+    return configloader.get()['general-config']['colors'][msg_type]
 
 
 def get_color_func(msg_type):

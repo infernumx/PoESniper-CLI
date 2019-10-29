@@ -8,6 +8,7 @@ import math
 import signal
 import init_sniper
 from libs import colortext
+import configloader
 
 console_thread = None
 
@@ -92,6 +93,13 @@ def __commands(raw_arg=None):
     for cmd, func in commands.items():
         log_cmd('{}: {}'.format(cmd, func.__doc__.strip()))
 
+def __reload_config(raw_arg=None):
+    """
+    Reloads config
+    """
+    configloader.load()
+    log_cmd('Config reloaded')
+
 
 commands = {
     'block': __block,
@@ -101,7 +109,8 @@ commands = {
     'exit': __exit,
     'exalt': __exalt,
     'redisplay': __redisplay,
-    'commands': __commands
+    'commands': __commands,
+    'reload': __reload_config
 }
 
 
