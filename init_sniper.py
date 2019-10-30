@@ -1,19 +1,13 @@
-from driver_handler import DriverHandler
+import tradeapi
 import time
 
 
-watchers = []
-driver = None
-
-
-def init(config):
-    global driver
-    driver = DriverHandler(config)
-
+def init():
+    tradeapi.setup()
 
 def redisplay():
-    driver.redisplay()
+    tradeapi.redisplay()
 
 
 def stop():
-    driver.stop()
+    tradeapi.stop()

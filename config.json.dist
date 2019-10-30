@@ -17,12 +17,9 @@
 	"item-filters": [
 		{
 			"item": "Jagged Fossil",
-			"identifier": "mwjqKaS6",
-			"config": {
-				"max_price": 1,
-				"resale": 4,
-				"min_profit": 2
-			}
-		},
+			"max_price": 1,
+			"resale": 4,
+			"min_proft": 2
+		}
 	]
 }
