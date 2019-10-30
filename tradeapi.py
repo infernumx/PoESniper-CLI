@@ -82,7 +82,7 @@ class ListingRetriever():
     def generate_id_str(self, results):
         if self.cache:
             id_list = [
-                x for x in results if not x in set(
+                x for x in results if x not in set(
                     y['listing_id'] for y in self.cache
                 )
             ][:20]
@@ -201,6 +201,7 @@ retrievers = []
 scheduler = None
 stop_refreshes = False
 
+
 def run_refreshes():
     if stop_refreshes:
         scheduler.remove_job('scheduler_task')
@@ -208,6 +209,7 @@ def run_refreshes():
 
     for retriever in retrievers:
         retriever.refresh()
+
 
 def setup(clear=False):
     global retrievers, scheduler
