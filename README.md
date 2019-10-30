@@ -7,7 +7,7 @@
 
 ## Installing required libraries
 * `python -m pip install --upgrade pip`
-* `python -m pip install requests apscheduler ratelimiter`
+* `python -m pip install requests apscheduler ratelimiter colorama`
 
 ## Instructions
 * Rename `config.dist.json` to `config.json` and open it
