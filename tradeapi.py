@@ -9,6 +9,7 @@ from libs import colortext
 from libs.iterators import ItemIterator
 from libs import hangul
 from pprint import pprint
+from playsound import playsound
 from apscheduler.schedulers.background import BlockingScheduler
 from ratelimiter import RateLimiter
 from threading import Lock, Thread
