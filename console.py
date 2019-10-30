@@ -46,7 +46,7 @@ def __view_blacklist(raw_arg=None):
 
 def __exit(raw_arg=None):
     """
-    Exits the program and cleans up selenium browsers
+    Exits the program.
     """
     init_sniper.stop()
     os._exit(0)
