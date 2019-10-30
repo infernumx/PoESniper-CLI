@@ -32,13 +32,19 @@ def yellow(txt, bright=False):
     return Fore.YELLOW + brightness + txt + Style.RESET_ALL
 
 
+def white(txt, bright=False):
+    brightness = bright and Style.BRIGHT or Style.NORMAL
+    return Fore.WHITE + brightness + txt + Style.RESET_ALL
+
+
 color_table = {
     'yellow': yellow,
     'blue': blue,
     'green': green,
     'magenta': magenta,
     'cyan': cyan,
-    'red': red
+    'red': red,
+    'white': white
 }
 
 def get_config_color(msg_type):
