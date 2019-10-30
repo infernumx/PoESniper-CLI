@@ -7,7 +7,7 @@
 
 ## Installing required libraries
 * `python -m pip install --upgrade pip`
-* `python -m pip install selenium bs4 apscheduler`
+* `python -m pip install selenium bs4 apscheduler ratelimiter`
 
 ## Instructions
 * Rename `config.dist.json` to `config.json` and open it
