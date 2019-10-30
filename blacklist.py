@@ -1,6 +1,6 @@
 import os
 from libs import colortext
-from configloader import config as SNIPER_CONFIG
+import configloader
 
 blacklist = []
 
@@ -56,5 +56,5 @@ def save():
 
 def should_display(ign):
     if find(ign):
-        return SNIPER_CONFIG['general-config']['display-blocked']
+        return configloader.get()['general-config']['display-blocked']
     return True
