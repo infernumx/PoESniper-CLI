@@ -137,14 +137,16 @@ class ListingRetriever():
             x for x in self.cache if not x['listing_id'] in current_ids
         ]
         for item in sold_items:
-            colortext.output(
-                '{} has sold their {} {}'.format(
-                    item['seller'],
-                    item['count'],
-                    item['name']
-                ),
-                'listing-remove'
-            )
+            if (blacklist.find(item['seller']) and
+                    blacklist.should_display(item['seller'])):
+                colortext.output(
+                    '{} has sold their {} {}'.format(
+                        item['seller'],
+                        item['count'],
+                        item['name']
+                    ),
+                    'listing-remove'
+                )
         self.cache = [
             x for x in self.cache if x['listing_id'] in current_ids
         ]
