@@ -191,9 +191,9 @@ class ListingRetriever():
                     ),
                     profit_str
                 )
-                if (blacklist.find(item['seller']) and
-                        blacklist.should_display(item['seller'])):
-                    colortext.output(whisper, 'blocked-whisper')
+                if blacklist.find(item['seller']):
+                    if blacklist.should_display(item['seller']):
+                        colortext.output(whisper, 'blocked-whisper')
                 else:
                     colortext.output(whisper, 'whisper')
 
