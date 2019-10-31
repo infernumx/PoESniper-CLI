@@ -138,15 +138,16 @@ class ListingRetriever():
         ]
         for item in sold_items:
             if (blacklist.find(item['seller']) and
-                    blacklist.should_display(item['seller'])):
-                colortext.output(
-                    '{} has sold their {} {}'.format(
-                        item['seller'],
-                        item['count'],
-                        item['name']
-                    ),
-                    'listing-remove'
-                )
+                    not blacklist.should_display(item['seller'])):
+                continue
+            colortext.output(
+                '{} has sold their {} {}'.format(
+                    item['seller'],
+                    item['count'],
+                    item['name']
+                ),
+                'listing-remove'
+            )
         self.cache = [
             x for x in self.cache if x['listing_id'] in current_ids
         ]
@@ -172,8 +173,16 @@ class ListingRetriever():
 
             to_whisper.sort(key=lambda x: x[1], reverse=True)
 
+            display = False
+            for item, profit in to_whisper:
+                if (not blacklist.find(item['seller']) or
+                        blacklist.find(item['seller']) and 
+                        blacklist.should_display(item['seller'])):
+                    display = True
+                    break
+
             # Add separator for new offers
-            if to_whisper:
+            if to_whisper and display:
                 # Send ding sound for new offers
                 if not redisplay and configloader.force_ding():
                     self.ding()
