@@ -1,65 +1,106 @@
 import requests
-import blacklist
 import json
-import datetime
 import time
 import websocket
-from threading import Thread, Lock
-from playsound import playsound
-from bs4 import BeautifulSoup
->>>>>>> Stashed changes
-from configloader import config as SNIPER_CONFIG
-from libs import colortext
-from libs import hangul
-from libs import deepnodesearcher as nodesearch
-import logging
+import configloader
+from threading import Thread
 
+def POESESSID():
+    return configloader.get()['general-config']['POESESSID']
 
-DEBUGGING = True
-output_lock = Lock()
-TRADE_URL = 'http://poe.trade/search/'
+class LiveSearch():
+    socket_id = 0
 
-class MultiLiveSearch():
-    def __init__(self, item_filters):
-        self.url = "arerigihahabeb"
-        websocket.enableTrace(False)
+    def __init__(self, identifier):
+        LiveSearch.socket_id += 1
+        self.socket_id = LiveSearch.socket_id
+        self.identifier = identifier
         self.ws = websocket.WebSocketApp(
-            'ws://live.poe.trade/' + self.url,
-            on_message=lambda ws, msg: self.on_message(ws, msg),
-            on_error=lambda ws, err: self.on_error(ws, err),
+            "wss://www.pathofexile.com/api/trade/live/Blight/" + identifier,
+            on_message=lambda ws, msg: self.on_message(msg),
+            on_error=lambda ws, err: self.on_error(err),
             on_close=lambda ws: self.on_close(ws),
-            on_open=lambda ws: print(ws)
+            on_open=lambda ws: self.on_open(ws),
+            cookie='POESESSID=' + POESESSID()
         )
-        self.new_id = -1
-        self.ws.run_forever()
+        thread = Thread(target=self.ws.run_forever)
+        thread.start()
 
-    def on_message(self, ws, msg):
-        print(msg)
-        payload = {'id': self.new_id}
-        r = requests.post('http:/poe.trade/search/' + self.url + "/live", data=payload, headers={'Content-Type': 'application/x-www-form-urlencoded'})
-        json_data = r.json()
-        self.new_id = json_data['newid']
-        if 'data' in json_data:
-            soup = BeautifulSoup(json_data['data'], 'html.parser')
-            items = soup.find_all("tbody", { "class" : "item" })
-            
-            for item in items:
-                print('@'+item.get('data-ign') + ' Hi, I would like to buy your ' + item.get('data-name') + ' listed for ' + item.get('data-buyout') + ' in ' + item.get('data-league')+' (stash tab \"' + item.get('data-tab')+ '\"; position: left ' + item.get('data-x')+ ', top ' +item.get('data-y') +')')
+    def on_message(self, msg):
+        msg = json.loads(msg)
+        query_url = 'https://www.pathofexile.com/api/trade/fetch/' \
+                    '{}?query={}&exchange'
+        r = requests.get(
+            query_url.format(
+                ','.join(msg['new']),
+                self.identifier
+            )
+        )
+        print(r.json())
 
-    def on_error(self, ws, error):
-        print(error)
+    def on_error(self, err):
+        print(err)
+
+    def on_open(self, ws):
+        print('Websocket #{} connected'.format(self.socket_id))
 
     def on_close(self, ws):
-        pass
+        print('close')
 
-def start():
-    def init():
-        MultiLiveSearch(SNIPER_CONFIG['live-searches'])
-    thread = Thread(target=init)
-    thread.start()
-    print('Websocket initialized')
-    input()
+class MultiLiveSearcher():
+    def __init__(self):
+        self.live_searches = []
+        for item_cfg in configloader.get()['item-filters']:
+            identifier = self.get_identifier(item_cfg)
+            if not identifier:
+                continue
+            self.live_searches.append(LiveSearch(identifier))
 
-start()
+    @staticmethod
+    def get_identifier(item_config):
+        payload = {
+            "query": {
+                "status": {
+                    "option": "online"
+                },
+                "type": item_config.get('item'),
+                "stats": [
+                    {
+                        "type": "and",
+                        "filters": []
+                    }
+                ],
+                "filters": {
+                    "trade_filters": {
+                        "filters": {
+                            "price": {
+                                "option": "chaos"
+                            }
+                        }
+                    }
+                }
+            },
+            "sort": {
+                "price": "asc"
+            }
+        }
+        # Return all ids listed from API
+        id_request = requests.post(
+            'https://www.pathofexile.com/api/trade/search/Blight',
+            headers={'Content-Type': 'application/json'},
+            data=json.dumps(payload)
+        )
+        response_json = id_request.json()
+        if response_json.get('error'):
+            if response_json['error']['code'] == 2:
+                payload['query']['type'] = None
+                payload['query']['name'] = item_config.get('item')
+                id_request = requests.post(
+                    'https://www.pathofexile.com/api/trade/search/Blight',
+                    headers={'Content-Type': 'application/json'},
+                    data=json.dumps(payload)
+                )
+                response_json = id_request.json()
+        return response_json.get('id')
 
-#print(requests.post('http://poe.trade/search/arerigihahabeb/live', data={'id': 1166667635}, headers={'Content-Type': 'application/x-www-form-urlencoded'}).json())
+MultiLiveSearcher()
