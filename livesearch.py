@@ -16,7 +16,8 @@ class LiveSearch():
         self.socket_id = LiveSearch.socket_id
         self.identifier = identifier
         self.ws = websocket.WebSocketApp(
-            "wss://www.pathofexile.com/api/trade/live/Blight/" + identifier,
+            "wss://www.pathofexile.com/api/trade/live/" \
+            + configloader.get_league() + "/" + identifier,
             on_message=lambda ws, msg: self.on_message(msg),
             on_error=lambda ws, err: self.on_error(err),
             on_close=lambda ws: self.on_close(ws),
@@ -86,7 +87,8 @@ class MultiLiveSearcher():
         }
         # Return all ids listed from API
         id_request = requests.post(
-            'https://www.pathofexile.com/api/trade/search/Blight',
+            'https://www.pathofexile.com/api/trade/search/' \
+            + configloader.get_league(),
             headers={'Content-Type': 'application/json'},
             data=json.dumps(payload)
         )
@@ -96,7 +98,8 @@ class MultiLiveSearcher():
                 payload['query']['type'] = None
                 payload['query']['name'] = item_config.get('item')
                 id_request = requests.post(
-                    'https://www.pathofexile.com/api/trade/search/Blight',
+                    'https://www.pathofexile.com/api/trade/search/' \
+                    + configloader.get_league(),
                     headers={'Content-Type': 'application/json'},
                     data=json.dumps(payload)
                 )

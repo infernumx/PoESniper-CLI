@@ -46,3 +46,6 @@ def get_item_name_color():
 
 def force_ding():
 	return get()['general-config']['ding']
+
+def get_league():
+	return get()['general-config']['league']

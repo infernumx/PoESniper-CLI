@@ -28,7 +28,8 @@ output_lock = Lock()
 def api_request(payload):
     # Return all ids listed from API
     id_request = requests.post(
-        'https://www.pathofexile.com/api/trade/exchange/Blight',
+        'https://www.pathofexile.com/api/trade/exchange/' \
+        + configloader.get_league(),
         headers={'Content-Type': 'application/json'},
         data=json.dumps(payload)
     )
