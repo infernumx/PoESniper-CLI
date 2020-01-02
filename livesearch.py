@@ -53,16 +53,10 @@ class LiveSearch():
             ]
         )
 
-        tmp = self.ws.send
-        def __tmp(*args, **kwargs):
-            print('sending data', *args, **kwargs)
-        self.ws._send_ping = tmp
-
         self.ws.on_open = lambda ws: self.on_open(ws)
 
         thread = Thread(target=self.ws.run_forever, kwargs={
-            'origin': "https://www.pathofexile.com",
-            'ping_interval': 0
+            'origin': "https://www.pathofexile.com"
         })
 
         thread.setDaemon(True)
