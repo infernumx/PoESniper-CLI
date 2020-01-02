@@ -49,3 +49,6 @@ def force_ding():
 
 def get_league():
 	return get()['general-config']['league']
+
+def get_poesessid():
+	return get()['general-config']['POESESSID']
