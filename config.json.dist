@@ -1,19 +1,7 @@
 {
 	"general-config": {
 		"league": "Standard",
-		"ding": true,
-		"display-blocked": false,
-		"colors": {
-			"error": {"color": "red", "bright": true},
-			"whisper": {"color": "green", "bright": false},
-			"blocked-whisper": {"color": "red", "bright": false},
-			"listing-update": {"color": "cyan", "bright": true},
-			"listing-remove": {"color": "yellow", "bright": true},
-			"item-name": {"color": "magenta", "bright": false},
-			"logging": {"color": "red", "bright": false},
-			"console-logging": {"color": "red", "bright": true},
-			"console-command": {"color": "cyan", "bright": true}
-		}
+		"POESESSID": "SessionID"
 	},
 	"item-filters": [
 		{

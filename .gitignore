@@ -1,7 +1,3 @@
 __pycache__
-**/__pycache__
-*.txt
+venv
 *.json
-blacklist.txt
-debug.log
-*.html

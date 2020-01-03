@@ -2,70 +2,67 @@ import requests
 import ssl
 import json
 import configloader
-import blacklist
 from threading import Thread
 from libs.iterators import ItemIterator
 from PoESniperGUI import GUI
-import websocket
+from poesocket import PoESocket, PoEConnections
 
 gui = None
 
 class LiveSearch():
-    socket_id = 0
-
     def __init__(self, identifier, item_config):
-        LiveSearch.socket_id += 1
-
         self.item_config = item_config
-        self.socket_id = LiveSearch.socket_id
         self.identifier = identifier
 
-        self.open_websocket()
 
-    def open_websocket(self):
-        websocket.enableTrace(True)
-
-        league = configloader.get_league()
-
-        # Get __cfduid for cookies
-        session = requests.Session()
-        session.get('https://www.pathofexile.com/')
-        __cfduid = session.cookies.get_dict()['__cfduid']
-
-        self.ws = websocket.WebSocketApp(
-            "wss://www.pathofexile.com/api/trade/live/{}/{}".format(
-                configloader.get_league(),
-                self.identifier
-            ),
-            on_message=lambda ws, msg: self.on_message(msg),
-            on_error=lambda ws, err: self.on_error(ws, err),
-            on_close=lambda ws, code, reason: self.on_close(ws, code, reason),
-            cookie='__cfduid={}; POESESSID={}'.format(
-                __cfduid,
-                configloader.get_poesessid()
-            ),
-            header=[
-                "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-                "AppleWebKit/537.36 (KHTML, like Gecko)"
-                "Chrome/79.0.3945.88 Safari/537.36",
-
-                "Accept: */*"
-            ]
+    def start(self):
+        self.socket = PoESocket(
+            configloader.get_league(),
+            self.identifier,
+            configloader.get_poesessid(),
+            on_message=self.on_message,
+            on_connected=self.on_connected,
+            on_disconnected=self.on_disconnected
         )
 
-        self.ws.on_open = lambda ws: self.on_open(ws)
+    def stop(self):
+        self.socket.close_connection()
 
-        thread = Thread(target=self.ws.run_forever, kwargs={
-            'origin': "https://www.pathofexile.com"
-        })
+    def on_connected(self, socket):
+        gui.update_element(
+            key='_WEBSOCKET_CONNECTIONS_',
+            value='Websockets Connected: {}'.format(
+                PoEConnections.status_update()
+            )
+        )
 
-        thread.setDaemon(True)
-        thread.start()
+    def on_disconnected(self, socket):
+        gui.update_element(
+            key='_WEBSOCKET_CONNECTIONS_',
+            value='Websockets Connected: {}'.format(
+                PoEConnections.status_update()
+            )
+        )
 
-    def parse_msg(self, items):
+    def on_message(self, msg):
+        msg = json.loads(msg)
+        query_url = 'https://www.pathofexile.com/api/trade/fetch/' \
+                    '{}?query={}&exchange'
+        r = requests.get(
+            query_url.format(
+                ','.join(msg['new']),
+                self.identifier
+            )
+        )
+        items = [r.json()['result'][0]]
+
         for item in ItemIterator(items):
             if (self.item_config.get('max_price') and 
                     item['price'] > self.item_config['max_price']):
+                continue
+
+            if (self.item_config.get('min_stock') and
+                    item['count'] < self.item_config['min_stock']):
                 continue
             
             profit = (
@@ -79,38 +76,7 @@ class LiveSearch():
                     profit < self.item_config['min_profit']):
                 continue
 
-            if (blacklist.find(item['seller']) and
-                    blacklist.should_display(item['seller'])):
-                gui.add_item(item)
-            else:
-                gui.add_item(item)
-
-    def on_message(self, msg):
-        msg = json.loads(msg)
-        query_url = 'https://www.pathofexile.com/api/trade/fetch/' \
-                    '{}?query={}&exchange'
-        r = requests.get(
-            query_url.format(
-                ','.join(msg['new']),
-                self.identifier
-            )
-        )
-
-        self.parse_msg(r.json()['result'])
-
-    def on_error(self, ws, err):
-        print('Websocket #{} error: '.format(self.socket_id, err))
-
-    def on_open(self, ws):
-        print('Websocket #{} connected'.format(self.socket_id))
-
-    def on_close(self, ws, code, reason):
-        print('Websocket #{} closed [Code {}] | Reason: "{}"'.format(
-            self.socket_id,
-            code,
-            reason
-        ))
-        self.open_websocket()
+            gui.add_item(item)
 
 class MultiLiveSearcher():
     def __init__(self):
@@ -123,7 +89,15 @@ class MultiLiveSearcher():
             identifier = self.get_identifier(item_cfg)
             if not identifier:
                 continue
-            self.live_searches.append(LiveSearch(identifier, item_cfg))
+            live_search = LiveSearch(identifier, item_cfg)
+            self.live_searches.append(live_search)
+            thread = Thread(target=live_search.start)
+            thread.daemon = True
+            thread.start()
+
+    def stop(self):
+        for live_search in self.live_searches:
+            live_search.stop()
 
     @staticmethod
     def get_identifier(item_config):
