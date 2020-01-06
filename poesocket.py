@@ -16,9 +16,7 @@ class PoESocket:
         self.on_message = on_message
         self.on_connected = on_connected
         self.on_disconnected = on_disconnected
-
         self.reconnecting = False
-
         PoESocket.socket_id += 1
         self.socket_id = PoESocket.socket_id
 
@@ -61,7 +59,7 @@ class PoESocket:
                 self.on_connected(self)
 
     def close_connection(self):
-        self.ws.close()
+        self.ws.close(status=6969, reason="Stop Button")
         if self.on_disconnected:
             self.on_disconnected(self)
 
@@ -77,7 +75,7 @@ class PoESocket:
             code,
             reason
         ))
-        if code and code == 1008:
+        if code and code != 6969:
             self.establish_connection(sleep_time=3)
 
     def reconnect(self):

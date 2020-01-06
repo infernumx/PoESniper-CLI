@@ -1,5 +1,10 @@
 import PySimpleGUI as sg
 from datetime import datetime
+from pynput.keyboard import Key, Controller
+import pygetwindow as gw
+import time
+
+keyboard = Controller()
 
 sg.LOOK_AND_FEEL_TABLE["SniperTheme"] = {
     "BACKGROUND": "#2c2825",
@@ -15,6 +20,8 @@ sg.LOOK_AND_FEEL_TABLE["SniperTheme"] = {
 }
 
 THEME_FONT = ("MingLiU", 12)
+
+sg.set_options(ttk_theme='clam')
 
 class GUI():
     def __init__(self, app):
@@ -46,6 +53,7 @@ class GUI():
                 ),
                 sg.Button(
                     'Send PM',
+                    key='_SEND_PM_',
                     font=THEME_FONT
                 )
             ],
@@ -82,13 +90,20 @@ class GUI():
         self.window[key].Update(value)
 
     def add_item(self, item):
-        result_str = '[{}] {} | (B/O {} | Profit {}) {}x {}'.format(
+        profit = str(item['profit'])
+        profit = profit.ljust(6 - len(profit))
+        buyout = str(item['full_cost'])
+        buyout = buyout.ljust(6 - len(buyout))
+        count = str(item['count'])
+        count = count.ljust(6 - len(count))
+        name = item['name'].rjust(30 - len(item['name']))
+        result_str = '[{}] Profit: {:<4} Buyout: {:<4} x{:<2} {} | {}'.format(
             datetime.now().strftime('%H:%M:%S'),
-            item['seller'],
-            item['full_cost'],
-            item['profit'],
-            item['count'],
-            item['name']
+            profit,
+            buyout,
+            count,
+            name,
+            item['seller']
         )
 
         if not result_str in self.unique_results:
@@ -96,8 +111,22 @@ class GUI():
             self.unique_results.add(result_str)
             self.whispers.insert(0, item['whisper'])
             self.window['_WHISPER_LIST_'].Update(values=self.results)
+            self.selected_whisper = self.whispers[0]
+
+    def send_whisper(self, msg):
+        titles = gw.getAllTitles()
+        if 'Path of Exile' in titles:
+            window = gw.getWindowsWithTitle('Path of Exile')[0]
+            window.activate()
+            time.sleep(0.1)
+            keyboard.press(Key.enter)
+            keyboard.release(Key.enter)
+            keyboard.type(msg)
+            keyboard.press(Key.enter)
+            keyboard.release(Key.enter)
 
     def main(self):
+        self.selected_whisper = None
         while True:
             event, value = self.window.read()
             # print(event, value)
@@ -119,7 +148,12 @@ class GUI():
                 result = value['_WHISPER_LIST_'][0]
                 for i, res in enumerate(self.results):
                     if res == result:
-                        # print(self.whispers[i])
+                        self.selected_whisper = self.whispers[i]
                         break
+            elif event == '_SEND_PM_':
+                if self.selected_whisper:
+                    self.send_whisper(self.selected_whisper)
+                elif len(self.whispers) == 1:
+                    self.send_whisper(self.whispers[0])
 
         self.window.close()

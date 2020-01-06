@@ -13,6 +13,7 @@ class LiveSearch():
     def __init__(self, identifier, item_config):
         self.item_config = item_config
         self.identifier = identifier
+        self.socket = None
 
 
     def start(self):
@@ -26,7 +27,8 @@ class LiveSearch():
         )
 
     def stop(self):
-        self.socket.close_connection()
+        if self.socket:
+            self.socket.close_connection()
 
     def on_connected(self, socket):
         gui.update_element(

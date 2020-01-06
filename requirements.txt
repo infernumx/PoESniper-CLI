@@ -1,7 +1,15 @@
 certifi==2019.11.28
 chardet==3.0.4
+docutils==0.15.2
 idna==2.8
+Kivy-Garden==0.1.4
+PyGetWindow==0.0.8
+Pygments==2.5.2
+pynput==1.6.4
+pypiwin32==223
+PyRect==0.1.4
 PySimpleGUI==4.14.1
+pywin32==227
 requests==2.22.0
 six==1.13.0
 urllib3==1.25.7
