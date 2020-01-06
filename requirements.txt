@@ -2,7 +2,6 @@ certifi==2019.11.28
 chardet==3.0.4
 docutils==0.15.2
 idna==2.8
-Kivy-Garden==0.1.4
 PyGetWindow==0.0.8
 Pygments==2.5.2
 pynput==1.6.4

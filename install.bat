@@ -1,0 +1,1 @@
+python -m venv venv && cd "venv/scripts" && activate.bat && cd "../../" && pip install -r requirements.txt
