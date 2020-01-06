@@ -1,16 +1,14 @@
 # PoESniper
- CLI-Based Item sniper for Path of Exile
+Item sniper for Path of Exile
 
 ## Requirements
-* Python 3.6+
-* Cmder (https://cmder.net/)
-
-## Installing required libraries
-* `python -m pip install --upgrade pip`
-* `python -m pip install requests apscheduler ratelimiter colorama playsound`
+* Python 3.7+ (Make sure you check add to PATH in the installer)
 
 ## Instructions
+* Run install.bat
 * Rename `config.dist.json` to `config.json` and open it
+* Change "league" to the league you wish to search in
+* Change "POESESSID" to your POE Session id (f12 in browser on pathofexile.com while logged in, application tab, cookies, copy POESESSID)
 * Add JSON objects for each item you'd like to snipe
 
 > item : Item name
@@ -21,8 +19,4 @@
  
 > resale : Price you're flipping at, used to determine profit margin (resale - price)
 
-
-* Start cmder
-* Copy/paste the directory of PoESniper and do `cd "<directory here>"`
-* run `python PoESniper.py`
-* Type `commands` and press enter to view available commands
+* Run start.py

@@ -1,1 +1,1 @@
-cd "venv/scripts" && activate.bat && cd "../../" && livesearch.py
+cd "venv/scripts" && activate.bat && cd "../../" && python livesearch.py

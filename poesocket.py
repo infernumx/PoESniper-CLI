@@ -76,7 +76,7 @@ class PoESocket:
             reason
         ))
         if code and code != 6969:
-            self.establish_connection(sleep_time=3)
+            self.establish_connection(sleep_time=5)
 
     def reconnect(self):
         if not self.reconnecting:

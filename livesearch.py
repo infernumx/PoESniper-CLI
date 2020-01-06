@@ -2,6 +2,7 @@ import requests
 import ssl
 import json
 import configloader
+import time
 from threading import Thread
 from libs.iterators import ItemIterator
 from PoESniperGUI import GUI
@@ -96,6 +97,7 @@ class MultiLiveSearcher():
             thread = Thread(target=live_search.start)
             thread.daemon = True
             thread.start()
+            time.sleep(1)
 
     def stop(self):
         for live_search in self.live_searches:
