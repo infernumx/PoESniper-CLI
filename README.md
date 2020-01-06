@@ -6,7 +6,7 @@ Item sniper for Path of Exile
 
 ## Instructions
 * Run install.bat
-* Rename `config.dist.json` to `config.json` and open it
+* Rename `config.json.dist` to `config.json` and open it
 * Change "league" to the league you wish to search in
 * Change "POESESSID" to your POE Session id (f12 in browser on pathofexile.com while logged in, application tab, cookies, copy POESESSID)
 * Add JSON objects for each item you'd like to snipe
